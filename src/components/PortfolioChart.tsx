@@ -54,18 +54,50 @@ export function PortfolioChart({
 
       ctx.clearRect(0, 0, w, h);
 
-      let hexColor = color;
+      let resolvedColor = color;
       if (color.startsWith("var(")) {
         const varMatch = color.match(/var\(([^)]+)\)/);
         if (varMatch && typeof window !== "undefined") {
-          hexColor = window.getComputedStyle(document.documentElement).getPropertyValue(varMatch[1]).trim() || color;
+          resolvedColor =
+            window
+              .getComputedStyle(document.documentElement)
+              .getPropertyValue(varMatch[1])
+              .trim() || color;
         }
       }
 
+      const hexMatch = resolvedColor.match(/^#([a-f\d]{3}|[a-f\d]{6})$/i);
+      const rgbFunctionMatch = resolvedColor.match(/^rgba?\(([^)]+)\)$/i);
+
+      const withAlpha = (alpha: number) => {
+        if (hexMatch) {
+          const hexValue = hexMatch[1];
+          const normalizedHex =
+            hexValue.length === 3
+              ? hexValue
+                  .split("")
+                  .map((char) => char + char)
+                  .join("")
+              : hexValue;
+
+          const r = parseInt(normalizedHex.slice(0, 2), 16);
+          const g = parseInt(normalizedHex.slice(2, 4), 16);
+          const b = parseInt(normalizedHex.slice(4, 6), 16);
+          return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        if (rgbFunctionMatch) {
+          const [r = "0", g = "0", b = "0"] = rgbFunctionMatch[1].split(",");
+          return `rgba(${Number.parseFloat(r)}, ${Number.parseFloat(g)}, ${Number.parseFloat(b)}, ${alpha})`;
+        }
+
+        return alpha === 0 ? "rgba(0, 0, 0, 0)" : resolvedColor;
+      };
+
       // Draw gradient fill
       const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, hexColor + "30");
-      grad.addColorStop(1, hexColor + "00");
+      grad.addColorStop(0, withAlpha(0.22));
+      grad.addColorStop(1, withAlpha(0));
 
       ctx.beginPath();
       ctx.moveTo(0, h);
@@ -105,7 +137,7 @@ export function PortfolioChart({
           ctx.bezierCurveTo(cpx, prevY, cpx, y, x, y);
         }
       }
-      ctx.strokeStyle = color;
+      ctx.strokeStyle = resolvedColor;
       ctx.lineWidth = 2.5;
       ctx.stroke();
 
@@ -113,11 +145,11 @@ export function PortfolioChart({
       if (ease > 0.1) {
         ctx.beginPath();
         ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
-        ctx.fillStyle = hexColor;
+        ctx.fillStyle = resolvedColor;
         ctx.fill();
         ctx.beginPath();
         ctx.arc(lastX, lastY, 8, 0, Math.PI * 2);
-        ctx.fillStyle = hexColor + "30";
+        ctx.fillStyle = withAlpha(0.22);
         ctx.fill();
       }
 

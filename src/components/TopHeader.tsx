@@ -14,6 +14,26 @@ const tabs = [
   { label: "Insights", href: "/insights" },
 ];
 
+const actionButtonStyle: CSSProperties = {
+  color: "var(--theme-on-surface-variant)",
+  border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 76%, transparent)",
+  background: "color-mix(in srgb, var(--theme-surface-container-low) 94%, transparent)",
+  boxShadow: "inset 0 1px 0 color-mix(in srgb, white 8%, transparent)",
+};
+
+const getTabStyle = (isActive: boolean): CSSProperties =>
+  isActive
+    ? {
+        color: "var(--theme-primary)",
+        background: "color-mix(in srgb, var(--theme-primary) 14%, transparent)",
+        border: "1px solid color-mix(in srgb, var(--theme-primary) 26%, transparent)",
+        boxShadow: "0 6px 14px color-mix(in srgb, var(--theme-primary) 15%, transparent)",
+      }
+    : {
+        color: "var(--theme-on-surface-variant)",
+        border: "1px solid transparent",
+      };
+
 export function TopHeader() {
   const pathname = usePathname();
   const { role, setRole } = useRole();
@@ -29,27 +49,28 @@ export function TopHeader() {
 
   return (
     <header
-      className="fixed top-3 sm:top-5 left-1/2 lg:left-[var(--header-desktop-left)] -translate-x-1/2 z-[60] flex justify-between items-center px-3 sm:px-4 lg:px-6 h-14 lg:h-16 rounded-2xl transition-all duration-300 w-[var(--header-mobile-width)] lg:w-[var(--header-desktop-width)]"
+      className="fixed top-3 sm:top-4 left-1/2 lg:left-[var(--header-desktop-left)] -translate-x-1/2 z-[60] flex justify-between items-center px-3 sm:px-4 lg:px-5 h-[58px] lg:h-[66px] rounded-2xl transition-all duration-300 w-[var(--header-mobile-width)] lg:w-[var(--header-desktop-width)]"
       style={{
-        "--header-mobile-width": "min(1120px, calc(100vw - 1rem))",
-        "--header-desktop-width": `min(1120px, calc(100vw - ${desktopSidebarWidth}px - 1rem))`,
+        "--header-mobile-width": "min(1120px, calc(100vw - 0.75rem))",
+        "--header-desktop-width": `min(1120px, calc(100vw - ${desktopSidebarWidth}px - 1.25rem))`,
         "--header-desktop-left": `calc(${desktopSidebarWidth}px + (100vw - ${desktopSidebarWidth}px) / 2)`,
-        background: "color-mix(in srgb, var(--theme-surface-bright) 92%, transparent)",
-        backdropFilter: "blur(14px)",
-        WebkitBackdropFilter: "blur(14px)",
-        border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 85%, transparent)",
-        boxShadow: "0 8px 24px rgba(2, 8, 23, 0.14)",
+        background: "color-mix(in srgb, var(--theme-surface-bright) 90%, transparent)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 82%, transparent)",
+        boxShadow:
+          "0 10px 30px rgba(2, 8, 23, 0.18), inset 0 1px 0 color-mix(in srgb, white 9%, transparent)",
       } as CSSProperties}
     >
-      <div className="flex items-center gap-2 lg:gap-6">
-        <Link href="/" className="flex items-center gap-2" aria-label="Go to overview">
+      <div className="flex min-w-0 items-center gap-2 lg:gap-5">
+        <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="Go to overview">
           <svg
             width="30"
             height="30"
             viewBox="0 0 32 32"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="transition-transform hover:scale-105 duration-200"
+            className="transition-transform duration-200 hover:scale-105"
           >
             <path d="M4 16C9 8 18 8 26 12C20 18 12 18 4 16Z" fill="url(#gradient-logo-1)" />
             <path d="M28 16C23 24 14 24 6 20C12 14 20 14 28 16Z" fill="url(#gradient-logo-2)" />
@@ -64,7 +85,7 @@ export function TopHeader() {
               </linearGradient>
             </defs>
           </svg>
-          <div className="hidden sm:block leading-tight">
+          <div className="hidden min-w-0 leading-tight sm:block">
             <p
               style={{
                 margin: 0,
@@ -90,8 +111,26 @@ export function TopHeader() {
         </Link>
 
         <div
+          className="hidden xl:flex items-center gap-1.5 rounded-full px-2.5 py-1"
+          style={{
+            border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 78%, transparent)",
+            background: "color-mix(in srgb, var(--theme-surface-container-low) 88%, transparent)",
+          }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: "0.95rem", color: "var(--theme-tertiary)" }}>
+            signal_cellular_alt
+          </span>
+          <span style={{ fontSize: "0.68rem", color: "var(--theme-on-surface-variant)", fontWeight: 600 }}>
+            Markets stable
+          </span>
+        </div>
+
+        <div
           className="hidden lg:flex items-center gap-1 p-1 rounded-xl"
-          style={{ background: "var(--theme-surface-container-low)" }}
+          style={{
+            background: "color-mix(in srgb, var(--theme-surface-container-low) 86%, transparent)",
+            border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 82%, transparent)",
+          }}
         >
           {tabs.map((tab) => {
             const isActive = pathname === tab.href;
@@ -99,19 +138,8 @@ export function TopHeader() {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className="text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg"
-                style={
-                  isActive
-                    ? {
-                        color: "var(--theme-primary)",
-                        background: "color-mix(in srgb, var(--theme-primary) 12%, transparent)",
-                        border: "1px solid color-mix(in srgb, var(--theme-primary) 22%, transparent)",
-                      }
-                    : {
-                        color: "var(--theme-on-surface-variant)",
-                        border: "1px solid transparent",
-                      }
-                }
+                className="text-sm font-semibold tracking-[0.01em] transition-colors duration-200 px-3.5 py-1.5 rounded-lg"
+                style={getTabStyle(isActive)}
               >
                 {tab.label}
               </Link>
@@ -120,21 +148,21 @@ export function TopHeader() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 lg:gap-3">
+      <div className="flex items-center gap-2">
         <div
-          className="p-1 rounded-lg hidden md:flex items-center relative"
+          className="hidden lg:flex items-center relative rounded-xl p-1"
           style={{
-            background: "var(--theme-surface-container-low)",
-            border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 85%, transparent)",
+            background: "color-mix(in srgb, var(--theme-surface-container-low) 88%, transparent)",
+            border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 82%, transparent)",
           }}
         >
           <div
-            className="absolute h-8 rounded-md transition-all duration-300"
+            className="absolute h-8 rounded-lg transition-all duration-300"
             style={{
-              width: 66,
-              background: "var(--theme-surface-container-highest)",
-              left: role === "admin" ? 4 : 70,
-              boxShadow: "0 1px 6px rgba(2, 8, 23, 0.16)",
+              width: 68,
+              background: "color-mix(in srgb, var(--theme-surface-container-highest) 90%, transparent)",
+              left: role === "admin" ? 4 : 74,
+              boxShadow: "0 6px 12px rgba(2, 8, 23, 0.2)",
             }}
           />
           <button
@@ -156,12 +184,8 @@ export function TopHeader() {
         <button
           onClick={handleThemeToggle}
           aria-label="Toggle theme"
-          className="w-9 h-9 rounded-lg transition-colors flex items-center justify-center cursor-pointer hover:text-[var(--theme-primary)]"
-          style={{
-            color: "var(--theme-on-surface-variant)",
-            border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 75%, transparent)",
-            background: "var(--theme-surface-container-low)",
-          }}
+          className="w-9 h-9 rounded-xl transition-colors flex items-center justify-center cursor-pointer hover:text-[var(--theme-primary)]"
+          style={actionButtonStyle}
           title={`Current Theme: ${theme}`}
         >
           <span className="material-symbols-outlined">
@@ -172,12 +196,8 @@ export function TopHeader() {
         <button
           onClick={() => showToast("No New Notifications", "You are all caught up.", "info")}
           aria-label="Show notifications"
-          className="w-9 h-9 rounded-lg transition-colors relative flex items-center justify-center"
-          style={{
-            color: "var(--theme-on-surface-variant)",
-            border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 75%, transparent)",
-            background: "var(--theme-surface-container-low)",
-          }}
+          className="hidden sm:flex w-9 h-9 rounded-xl transition-colors relative items-center justify-center"
+          style={actionButtonStyle}
         >
           <span className="material-symbols-outlined">notifications</span>
           <div
@@ -196,10 +216,11 @@ export function TopHeader() {
 
         <Link href="/settings" aria-label="Open settings profile">
           <div
-            className="w-9 h-9 rounded-lg overflow-hidden transition-all duration-200 hover:scale-[1.03]"
+            className="w-9 h-9 rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.03]"
             style={{
               border: "1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)",
               background: "linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))",
+              boxShadow: "0 6px 16px color-mix(in srgb, var(--theme-primary) 24%, transparent)",
               cursor: "pointer",
             }}
           >

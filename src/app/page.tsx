@@ -31,11 +31,16 @@ const activities = [
 ];
 
 const categories = [
-  { label: "Housing", pct: "45%", color: "var(--theme-primary)" },
-  { label: "Food", pct: "25%", color: "var(--theme-secondary)" },
-  { label: "Entertainment", pct: "15%", color: "var(--theme-tertiary)" },
-  { label: "Transport", pct: "15%", color: "var(--theme-primary-dim)" },
+  { label: "Housing", value: 45, color: "var(--theme-primary)" },
+  { label: "Food", value: 25, color: "var(--theme-secondary)" },
+  { label: "Entertainment", value: 15, color: "var(--theme-tertiary)" },
+  { label: "Transport", value: 15, color: "var(--theme-primary-dim)" },
 ];
+
+const categoryTotal = categories.reduce((sum, category) => sum + category.value, 0);
+const categoryOffsets = categories.map((_, index) =>
+  categories.slice(0, index).reduce((sum, category) => sum + category.value, 0)
+);
 
 const trendData = [
   { month: "Jan", value: 36120, x: 0, y: 180 },
@@ -59,8 +64,10 @@ export default function DashboardPage() {
   const { showToast } = useNotification();
   const trendChartRef = useRef<HTMLDivElement | null>(null);
   const [activeTrendIndex, setActiveTrendIndex] = useState(trendData.length - 1);
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState<number | null>(null);
 
   const activeTrendPoint = trendData[activeTrendIndex];
+  const activeCategory = activeCategoryIndex === null ? null : categories[activeCategoryIndex];
 
   const setNearestTrendPoint = (clientX: number) => {
     const container = trendChartRef.current;
@@ -637,49 +644,35 @@ export default function DashboardPage() {
                     stroke="#152c4e"
                     strokeWidth="4"
                   />
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="16"
-                    fill="transparent"
-                    stroke="var(--theme-primary)"
-                    strokeWidth="4"
-                    strokeDasharray="45 100"
-                    strokeLinecap="round"
-                  />
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="16"
-                    fill="transparent"
-                    stroke="var(--theme-secondary)"
-                    strokeWidth="4"
-                    strokeDasharray="25 100"
-                    strokeDashoffset="-45"
-                    strokeLinecap="round"
-                  />
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="16"
-                    fill="transparent"
-                    stroke="var(--theme-tertiary)"
-                    strokeWidth="4"
-                    strokeDasharray="15 100"
-                    strokeDashoffset="-70"
-                    strokeLinecap="round"
-                  />
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="16"
-                    fill="transparent"
-                    stroke="var(--theme-primary-dim)"
-                    strokeWidth="4"
-                    strokeDasharray="15 100"
-                    strokeDashoffset="-85"
-                    strokeLinecap="round"
-                  />
+                  {categories.map((category, index) => {
+                    const segmentLength = (category.value / categoryTotal) * 100;
+                    const isActive = activeCategoryIndex === index;
+                    const isDimmed = activeCategoryIndex !== null && !isActive;
+
+                    return (
+                      <circle
+                        key={category.label}
+                        cx="18"
+                        cy="18"
+                        r="16"
+                        fill="transparent"
+                        stroke={category.color}
+                        strokeWidth={isActive ? "4.6" : "4"}
+                        strokeDasharray={`${segmentLength} 100`}
+                        strokeDashoffset={-categoryOffsets[index]}
+                        strokeLinecap="round"
+                        onMouseEnter={() => setActiveCategoryIndex(index)}
+                        onMouseLeave={() => setActiveCategoryIndex(null)}
+                        onTouchStart={() => setActiveCategoryIndex(index)}
+                        style={{
+                          cursor: "pointer",
+                          opacity: isDimmed ? 0.45 : 1,
+                          filter: isActive ? `drop-shadow(0 0 6px ${category.color})` : "none",
+                          transition: "opacity 0.2s ease, filter 0.2s ease, stroke-width 0.2s ease",
+                        }}
+                      />
+                    );
+                  })}
                 </svg>
                 <div
                   style={{
@@ -695,10 +688,11 @@ export default function DashboardPage() {
                     style={{
                       fontSize: "1.5rem",
                       fontWeight: 700,
-                      color: "var(--theme-on-surface)",
+                      color: activeCategory ? activeCategory.color : "var(--theme-on-surface)",
+                      transition: "color 0.2s ease",
                     }}
                   >
-                    64%
+                    {activeCategory ? `${activeCategory.value}%` : "64%"}
                   </p>
                   <p
                     style={{
@@ -706,56 +700,75 @@ export default function DashboardPage() {
                       color: "var(--theme-on-surface-variant)",
                       textTransform: "uppercase",
                       fontWeight: 700,
+                      textAlign: "center",
+                      maxWidth: "8.5rem",
                     }}
                   >
-                    Limit
+                    {activeCategory ? activeCategory.label : "Limit"}
                   </p>
                 </div>
               </div>
 
               {/* Legend */}
               <ul style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                {categories.map((cat, i) => (
-                  <li
-                    key={i}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div
+                {categories.map((cat, i) => {
+                  const isActive = activeCategoryIndex === i;
+                  const isDimmed = activeCategoryIndex !== null && !isActive;
+
+                  return (
+                    <li
+                      key={i}
+                      onMouseEnter={() => setActiveCategoryIndex(i)}
+                      onMouseLeave={() => setActiveCategoryIndex(null)}
+                      onTouchStart={() => setActiveCategoryIndex(i)}
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "0.75rem",
+                        justifyContent: "space-between",
+                        cursor: "pointer",
+                        borderRadius: "0.5rem",
+                        padding: "0.2rem 0.35rem",
+                        background: isActive
+                          ? "color-mix(in srgb, var(--theme-primary) 8%, transparent)"
+                          : "transparent",
+                        opacity: isDimmed ? 0.55 : 1,
+                        transition: "opacity 0.2s ease, background 0.2s ease",
                       }}
                     >
                       <div
                         style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          background: cat.color,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.75rem",
                         }}
-                      />
-                      <span
-                        style={{ fontSize: "0.875rem", color: "#cbd5e1" }}
                       >
-                        {cat.label}
+                        <div
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            background: cat.color,
+                          }}
+                        />
+                        <span
+                          style={{ fontSize: "0.875rem", color: "#cbd5e1" }}
+                        >
+                          {cat.label}
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "0.875rem",
+                          fontWeight: 700,
+                          color: isActive ? cat.color : "var(--theme-on-surface)",
+                          transition: "color 0.2s ease",
+                        }}
+                      >
+                        {cat.value}%
                       </span>
-                    </div>
-                    <span
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 700,
-                        color: "var(--theme-on-surface)",
-                      }}
-                    >
-                      {cat.pct}
-                    </span>
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
