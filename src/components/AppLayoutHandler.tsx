@@ -4,6 +4,7 @@ import React from "react";
 import { Sidebar } from "./Sidebar";
 import { TopHeader } from "./TopHeader";
 import { MobileNav } from "./MobileNav";
+import { CredentialsPanel } from "./CredentialsPanel";
 import { useLayout } from "@/context/LayoutContext";
 
 export function AppLayoutHandler({ children }: { children: React.ReactNode }) {
@@ -23,6 +24,7 @@ export function AppLayoutHandler({ children }: { children: React.ReactNode }) {
       >
         {children}
       </main>
+      <CredentialsPanel />
       <MobileNav />
     </>
   );

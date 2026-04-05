@@ -1,12 +1,88 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import { useNotification } from "@/context/NotificationContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useLayout } from "@/context/LayoutContext";
+
+const PROFILE_STORAGE_KEY = "aetheris-profile-settings";
+const PROFILE_UPDATED_EVENT = "aetheris-profile-updated";
+const DEFAULT_PROFILE_NAME = "Julian Sterling";
+
+type HeaderProfile = {
+  fullName: string;
+  avatar: string;
+};
+
+const DEFAULT_HEADER_PROFILE: HeaderProfile = {
+  fullName: DEFAULT_PROFILE_NAME,
+  avatar: "",
+};
+
+const DEFAULT_HEADER_PROFILE_SNAPSHOT = JSON.stringify(DEFAULT_HEADER_PROFILE);
+
+const getInitials = (name: string) => {
+  const parts = name.trim().split(" ").filter(Boolean);
+  if (parts.length === 0) return "JS";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? ""}${parts[parts.length - 1][0] ?? ""}`.toUpperCase();
+};
+
+const parseHeaderProfileSnapshot = (snapshot: string): HeaderProfile => {
+  try {
+    const parsed = JSON.parse(snapshot) as { fullName?: unknown; avatar?: unknown };
+    return {
+      fullName:
+        typeof parsed.fullName === "string" && parsed.fullName.trim().length > 0
+          ? parsed.fullName.trim()
+          : DEFAULT_PROFILE_NAME,
+      avatar: typeof parsed.avatar === "string" ? parsed.avatar : "",
+    };
+  } catch {
+    return DEFAULT_HEADER_PROFILE;
+  }
+};
+
+const getHeaderProfileSnapshot = (): string => {
+  if (typeof window === "undefined") {
+    return DEFAULT_HEADER_PROFILE_SNAPSHOT;
+  }
+
+  try {
+    return window.localStorage.getItem(PROFILE_STORAGE_KEY) ?? DEFAULT_HEADER_PROFILE_SNAPSHOT;
+  } catch {
+    return DEFAULT_HEADER_PROFILE_SNAPSHOT;
+  }
+};
+
+const getHeaderProfileServerSnapshot = () => DEFAULT_HEADER_PROFILE_SNAPSHOT;
+
+const subscribeHeaderProfile = (onStoreChange: () => void) => {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key && event.key !== PROFILE_STORAGE_KEY) return;
+    onStoreChange();
+  };
+
+  const handleProfileUpdated = () => {
+    onStoreChange();
+  };
+
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(PROFILE_UPDATED_EVENT, handleProfileUpdated);
+
+  return () => {
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(PROFILE_UPDATED_EVENT, handleProfileUpdated);
+  };
+};
 
 const tabs = [
   { label: "Overview", href: "/" },
@@ -40,7 +116,14 @@ export function TopHeader() {
   const { showToast } = useNotification();
   const { theme, cycleTheme } = useTheme();
   const { isSidebarCollapsed } = useLayout();
+  const profileSnapshot = useSyncExternalStore(
+    subscribeHeaderProfile,
+    getHeaderProfileSnapshot,
+    getHeaderProfileServerSnapshot
+  );
+  const profile = parseHeaderProfileSnapshot(profileSnapshot);
   const desktopSidebarWidth = isSidebarCollapsed ? 88 : 272;
+  const profileInitials = getInitials(profile.fullName);
 
   const handleThemeToggle = () => {
     cycleTheme();
@@ -150,31 +233,31 @@ export function TopHeader() {
 
       <div className="flex items-center gap-2">
         <div
-          className="hidden lg:flex items-center relative rounded-xl p-1"
+          className="hidden lg:grid grid-cols-2 items-center relative rounded-xl p-1 w-[152px] shrink-0 overflow-hidden"
           style={{
             background: "color-mix(in srgb, var(--theme-surface-container-low) 88%, transparent)",
             border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 82%, transparent)",
           }}
         >
           <div
-            className="absolute h-8 rounded-lg transition-all duration-300"
+            className="absolute top-1 bottom-1 left-1 rounded-lg transition-transform duration-300"
             style={{
-              width: 68,
+              width: "calc(50% - 0.25rem)",
               background: "color-mix(in srgb, var(--theme-surface-container-highest) 90%, transparent)",
-              left: role === "admin" ? 4 : 74,
+              transform: role === "admin" ? "translateX(0)" : "translateX(100%)",
               boxShadow: "0 6px 12px rgba(2, 8, 23, 0.2)",
             }}
           />
           <button
             onClick={() => setRole("admin")}
-            className="relative z-10 px-3 py-1 text-xs font-semibold transition-colors duration-200"
+            className="relative z-10 w-full text-center whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-semibold leading-none transition-colors duration-200"
             style={{ color: role === "admin" ? "var(--theme-primary)" : "var(--theme-on-surface-variant)" }}
           >
             Admin
           </button>
           <button
             onClick={() => setRole("viewer")}
-            className="relative z-10 px-3 py-1 text-xs font-semibold transition-colors duration-200"
+            className="relative z-10 w-full text-center whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-semibold leading-none transition-colors duration-200"
             style={{ color: role === "viewer" ? "var(--theme-secondary)" : "var(--theme-on-surface-variant)" }}
           >
             Viewer
@@ -224,9 +307,24 @@ export function TopHeader() {
               cursor: "pointer",
             }}
           >
-            <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ color: "var(--theme-on-primary)" }}>
-              JS
-            </div>
+            {profile.avatar ? (
+              <Image
+                src={profile.avatar}
+                alt={`${profile.fullName} profile photo`}
+                width={36}
+                height={36}
+                unoptimized
+                className="w-full h-full"
+                style={{ objectFit: "cover", objectPosition: "center" }}
+              />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center text-xs font-bold"
+                style={{ color: "var(--theme-on-primary)" }}
+              >
+                {profileInitials}
+              </div>
+            )}
           </div>
         </Link>
       </div>

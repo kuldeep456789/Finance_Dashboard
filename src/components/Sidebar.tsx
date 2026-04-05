@@ -14,6 +14,8 @@ const mainNav = [
   { icon: "settings", label: "Settings", href: "/settings" },
 ];
 
+const DEFAULT_USER_NAME = "Julian Sterling";
+
 const getNavItemStyle = (isActive: boolean): CSSProperties =>
   isActive
     ? {
@@ -32,15 +34,14 @@ export function Sidebar() {
   const pathname = usePathname();
   const { role } = useRole();
   const { showToast } = useNotification();
-  const { isSidebarCollapsed, toggleSidebar } = useLayout();
+  const { isSidebarCollapsed, toggleSidebar, openCredentialPanel } = useLayout();
+  const enrolledUserName = DEFAULT_USER_NAME;
 
-  const handleAddTransaction = () => {
-    if (role === "viewer") {
-      showToast("Access Denied", "Viewer roles cannot add transactions.", "error");
-    } else {
-      showToast("Action Initiated", "Opening transaction form...", "success");
-    }
+  const handleOpenCredentialPanel = () => {
+    openCredentialPanel();
+    showToast("Credential Manager", "Secure credential form opened.", "info");
   };
+
   const sidebarWidth = isSidebarCollapsed ? "88px" : "272px";
 
   return (
@@ -76,9 +77,12 @@ export function Sidebar() {
                 fontSize: "0.75rem",
                 color: "var(--theme-on-surface-variant)",
                 margin: 0,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
-              Portfolio Workspace
+              {enrolledUserName} • {role === "admin" ? "Admin Enrolled" : "Viewer Enrolled"}
             </p>
           </div>
         )}
@@ -180,7 +184,7 @@ export function Sidebar() {
 
       <div className={isSidebarCollapsed ? "px-1 mt-3" : "px-1 mt-3"}>
         <button
-          onClick={handleAddTransaction}
+          onClick={handleOpenCredentialPanel}
           className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 active:scale-95 hover:-translate-y-0.5 ${
             !isSidebarCollapsed ? "gap-2" : ""
           }`}
@@ -190,10 +194,10 @@ export function Sidebar() {
             border: "1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)",
             boxShadow: "0 10px 20px color-mix(in srgb, var(--theme-primary) 22%, transparent)",
           }}
-          title={isSidebarCollapsed ? "Add Transaction" : undefined}
+          title={isSidebarCollapsed ? "Add Credential" : undefined}
         >
           <span className="material-symbols-outlined">add</span>
-          {!isSidebarCollapsed && "Add Transaction"}
+          {!isSidebarCollapsed && "Add Credential"}
         </button>
       </div>
 

@@ -64,6 +64,7 @@ type ProfileData = {
 };
 
 const PROFILE_STORAGE_KEY = "aetheris-profile-settings";
+const PROFILE_UPDATED_EVENT = "aetheris-profile-updated";
 
 const defaultProfileData: ProfileData = {
   fullName: "Julian Sterling",
@@ -245,6 +246,11 @@ export default function SettingsPage() {
       avatar: draftProfileData.avatar,
       coverImage: draftProfileData.coverImage,
     };
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(nextProfile));
+      window.dispatchEvent(new Event(PROFILE_UPDATED_EVENT));
+    }
 
     setProfileData(nextProfile);
     setDraftProfileData(nextProfile);
@@ -818,7 +824,7 @@ export default function SettingsPage() {
               { label: "Portfolio Value", value: "$45,230", icon: "account_balance_wallet", color: "var(--theme-primary)" },
               { label: "Total Investments", value: "12", icon: "pie_chart", color: "var(--theme-secondary)" },
               { label: "Monthly ROI", value: "+12.5%", icon: "trending_up", color: "var(--theme-tertiary)" },
-              { label: "Member Since", value: "Jan 2022", icon: "calendar_month", color: "var(--theme-primary-dim)" },
+              { label: "Member Since", value: "Jan 2022", icon: "calendar_today", color: "var(--theme-primary)" },
             ].map((stat, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <span
