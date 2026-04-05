@@ -184,6 +184,40 @@ body {
 }
 
 /* ============================================
+   MATERIAL SYMBOLS BASELINE
+   ============================================ */
+
+.material-symbols-outlined,
+.material-symbols-rounded {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  white-space: nowrap;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  flex-shrink: 0;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+}
+
+.material-symbols-rounded {
+  font-family: "Material Symbols Rounded";
+}
+
+/* ============================================
    SCROLLBAR
    ============================================ */
 
@@ -728,7 +762,7 @@ body {
   right: 0;
   z-index: 50;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   gap: 0.35rem;
   background: color-mix(in srgb, var(--color-surface-container-low) 94%, transparent);
   backdrop-filter: blur(10px);
@@ -747,14 +781,18 @@ body {
 .mobile-nav-item {
   display: flex;
   flex-direction: column;
+  flex: 1 1 0;
   align-items: center;
+  justify-content: center;
   gap: 0.25rem;
   padding: 0.42rem 0.62rem;
   border-radius: 0.6rem;
-  min-width: 58px;
+  min-width: 0;
   color: var(--color-on-surface-variant);
   text-decoration: none;
   font-size: 0.625rem;
+  white-space: nowrap;
+  overflow: hidden;
   transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 

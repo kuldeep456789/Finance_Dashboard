@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 const items = [
   { icon: "dashboard", label: "Home", href: "/" },
   { icon: "payments", label: "Txns", href: "/transactions" },
