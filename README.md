@@ -4,7 +4,7 @@ high-end financial management dashboard built with Next.js, designed to provide 
 
 ##Desktop View
 
-![image alt](https://github.com/kuldeep456789/Dashboard/blob/b0b25ee440ac7455da07fc9cf7df929fd09bf8f3/image.png)
+![image alt](https://github.com/kuldeep456789/Finance_Dashboard/blob/2cb18b30130c3fb671ce8dc5904b087d21a41338/image%20(1).png)
 
 ##Mobile View
 
