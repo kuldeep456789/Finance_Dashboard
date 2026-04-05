@@ -146,38 +146,15 @@ export function TopHeader() {
       } as CSSProperties}
     >
       <div className="flex min-w-0 items-center gap-2 lg:gap-5">
-        <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="Go to overview">
+        <Link href="/" className="flex min-w-0 items-center" aria-label="Go to overview">
           <Image
-            src="/favicon.ico"
+            src="/logo.png"
             alt="Aetheris Finance logo"
-            width={30}
-            height={30}
+            width={42}
+            height={42}
             priority
-            className="h-[30px] w-[30px] rounded-full transition-transform duration-200 hover:scale-105"
+            className="h-[42px] w-[42px] rounded-full transition-transform duration-200 hover:scale-105"
           />
-          <div className="hidden min-w-0 leading-tight sm:block">
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.62rem",
-                letterSpacing: "0.16em",
-                fontWeight: 700,
-                color: "var(--theme-primary)",
-              }}
-            >
-              AETHERIS
-            </p>
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.68rem",
-                letterSpacing: "0.02em",
-                color: "var(--theme-on-surface-variant)",
-              }}
-            >
-              Finance Board
-            </p>
-          </div>
         </Link>
 
         <div

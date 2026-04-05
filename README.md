@@ -60,3 +60,10 @@ Then open `http://localhost:3000`.
 - App-level layout logic (header, sidebar, mobile nav) lives in `src/components/AppLayoutHandler.tsx`.
 - Theme, layout, role, and toast state are managed through dedicated context files in `src/context`.
 - Data shown in the dashboard is currently mock/static (no backend integration).
+
+## 🎨 Logo Customization
+To update the logo on GitHub:
+1.  **Replace File**: Upload your new image to the `public/` folder and name it `logo.png`.
+2.  **Commit & Push**: Commit the change and push it to your repository.
+3.  **Automatic update**: The dashboard will automatically use the new `logo.png`.
+

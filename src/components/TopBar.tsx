@@ -17,7 +17,7 @@ export function TopBar({ title, subtitle }: TopBarProps) {
       <div>
         <div className="top-bar-title-row">
           <Image
-            src="/favicon.ico"
+            src="/logo.png"
             alt="Aetheris Finance logo"
             width={24}
             height={24}

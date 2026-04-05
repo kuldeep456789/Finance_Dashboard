@@ -25,9 +25,9 @@ export const metadata: Metadata = {
   description:
     "A high-end animated finance dashboard with real-time portfolio analytics, transaction management, and intelligent financial insights.",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
 };
 
