@@ -349,6 +349,19 @@ body {
   letter-spacing: -0.02em;
 }
 
+.top-bar-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.top-bar-title-logo {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
 .top-bar-subtitle {
   font-size: 0.84rem;
   color: var(--color-on-surface-variant);

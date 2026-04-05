@@ -147,27 +147,14 @@ export function TopHeader() {
     >
       <div className="flex min-w-0 items-center gap-2 lg:gap-5">
         <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="Go to overview">
-          <svg
-            width="30"
-            height="30"
-            viewBox="0 0 32 32"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="transition-transform duration-200 hover:scale-105"
-          >
-            <path d="M4 16C9 8 18 8 26 12C20 18 12 18 4 16Z" fill="url(#gradient-logo-1)" />
-            <path d="M28 16C23 24 14 24 6 20C12 14 20 14 28 16Z" fill="url(#gradient-logo-2)" />
-            <defs>
-              <linearGradient id="gradient-logo-1" x1="4" y1="8" x2="26" y2="18" gradientUnits="userSpaceOnUse">
-                <stop stopColor="var(--theme-primary)" />
-                <stop offset="1" stopColor="var(--theme-primary-container)" />
-              </linearGradient>
-              <linearGradient id="gradient-logo-2" x1="6" y1="14" x2="28" y2="24" gradientUnits="userSpaceOnUse">
-                <stop stopColor="var(--theme-secondary)" />
-                <stop offset="1" stopColor="var(--theme-on-surface-variant)" />
-              </linearGradient>
-            </defs>
-          </svg>
+          <Image
+            src="/favicon.ico"
+            alt="Aetheris Finance logo"
+            width={30}
+            height={30}
+            priority
+            className="h-[30px] w-[30px] rounded-full transition-transform duration-200 hover:scale-105"
+          />
           <div className="hidden min-w-0 leading-tight sm:block">
             <p
               style={{

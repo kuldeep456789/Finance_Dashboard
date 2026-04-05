@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   title: "Aetheris Finance — Premium Dashboard",
   description:
     "A high-end animated finance dashboard with real-time portfolio analytics, transaction management, and intelligent financial insights.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

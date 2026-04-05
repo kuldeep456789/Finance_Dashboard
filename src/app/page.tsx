@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useNotification } from "@/context/NotificationContext";
+import { useLayout } from "@/context/LayoutContext";
 
 const activities = [
   {
@@ -60,14 +61,33 @@ const trendLinePath = trendData
 
 const trendAreaPath = `${trendLinePath} L${trendData[trendData.length - 1].x},${trendChartHeight} L${trendData[0].x},${trendChartHeight} Z`;
 
+const spotlightMetrics = [
+  { label: "Cash Flow Health", value: "92%", icon: "monitoring", color: "var(--theme-primary)" },
+  { label: "Risk Exposure", value: "Low", icon: "verified", color: "var(--theme-tertiary)" },
+  { label: "Open Credentials", value: "6", icon: "key", color: "var(--theme-secondary)" },
+  { label: "Alerts", value: "2 Active", icon: "campaign", color: "var(--theme-error)" },
+];
+
+const weeklyTargets = [
+  { label: "Expense Cap", progress: 78, value: "$3.1k / $4.0k" },
+  { label: "Savings Goal", progress: 64, value: "$6.4k / $10k" },
+  { label: "Investment Plan", progress: 89, value: "$8.9k / $10k" },
+];
+
 export default function DashboardPage() {
   const { showToast } = useNotification();
+  const { openCredentialPanel } = useLayout();
   const trendChartRef = useRef<HTMLDivElement | null>(null);
   const [activeTrendIndex, setActiveTrendIndex] = useState(trendData.length - 1);
   const [activeCategoryIndex, setActiveCategoryIndex] = useState<number | null>(null);
 
   const activeTrendPoint = trendData[activeTrendIndex];
   const activeCategory = activeCategoryIndex === null ? null : categories[activeCategoryIndex];
+
+  const handleOpenCredentialVault = () => {
+    openCredentialPanel();
+    showToast("Credential Vault", "Open vault and update your secure access details.", "info");
+  };
 
   const setNearestTrendPoint = (clientX: number) => {
     const container = trendChartRef.current;
@@ -95,6 +115,200 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1400px] space-y-8">
+      <section
+        className="glass-card animate-fade-in-up"
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          borderRadius: "1rem",
+          padding: "1.35rem",
+          background:
+            "linear-gradient(140deg, color-mix(in srgb, var(--theme-primary) 18%, var(--theme-surface-container-high) 82%) 0%, color-mix(in srgb, var(--theme-secondary) 13%, var(--theme-surface-container-high) 87%) 55%, color-mix(in srgb, var(--theme-tertiary) 11%, var(--theme-surface-container-high) 89%) 100%)",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            width: 240,
+            height: 240,
+            borderRadius: "50%",
+            background: "color-mix(in srgb, var(--theme-primary) 26%, transparent)",
+            top: -95,
+            right: -75,
+            filter: "blur(28px)",
+            opacity: 0.75,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            width: 180,
+            height: 180,
+            borderRadius: "50%",
+            background: "color-mix(in srgb, var(--theme-secondary) 22%, transparent)",
+            bottom: -95,
+            left: -50,
+            filter: "blur(24px)",
+            opacity: 0.72,
+          }}
+        />
+
+        <div className="relative z-10 grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6">
+          <div>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.69rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.13em",
+                fontWeight: 700,
+                color: "var(--theme-primary)",
+              }}
+            >
+              Executive Pulse
+            </p>
+            <h1
+              style={{
+                margin: "0.5rem 0 0",
+                fontFamily: "var(--font-heading)",
+                fontSize: "clamp(1.25rem, 2.5vw, 2rem)",
+                lineHeight: 1.16,
+                letterSpacing: "-0.02em",
+                color: "var(--theme-on-surface)",
+              }}
+            >
+              Portfolio operations are stable and outperforming plan.
+            </h1>
+            <p
+              style={{
+                margin: "0.55rem 0 0",
+                maxWidth: "44rem",
+                fontSize: "0.86rem",
+                color: "var(--theme-on-surface-variant)",
+              }}
+            >
+              Keep momentum by tracking this week&apos;s budget discipline, investment pacing, and credential hygiene from a single command layer.
+            </p>
+
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2.5">
+              {spotlightMetrics.map((metric) => (
+                <div
+                  key={metric.label}
+                  style={{
+                    borderRadius: "0.8rem",
+                    padding: "0.65rem",
+                    background: "color-mix(in srgb, var(--theme-surface-container-low) 72%, transparent)",
+                    border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 80%, transparent)",
+                  }}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined" style={{ fontSize: "0.95rem", color: metric.color }}>
+                      {metric.icon}
+                    </span>
+                    <span style={{ fontSize: "0.68rem", color: "var(--theme-on-surface-variant)", fontWeight: 700 }}>
+                      {metric.label}
+                    </span>
+                  </div>
+                  <p
+                    style={{
+                      margin: "0.3rem 0 0",
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "1.12rem",
+                      fontWeight: 800,
+                      color: "var(--theme-on-surface)",
+                    }}
+                  >
+                    {metric.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={handleOpenCredentialVault}
+                className="px-3.5 py-2 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all active:scale-95"
+                style={{
+                  background: "linear-gradient(135deg, var(--theme-primary), var(--theme-primary-container))",
+                  color: "var(--theme-on-primary)",
+                  border: "1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)",
+                  boxShadow: "0 10px 20px color-mix(in srgb, var(--theme-primary) 24%, transparent)",
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>
+                  add_circle
+                </span>
+                Add Credential
+              </button>
+              <button
+                onClick={() => showToast("Insights", "Opening weekly action briefing soon.", "info")}
+                className="px-3.5 py-2 rounded-xl font-semibold text-sm flex items-center gap-2 transition-colors"
+                style={{
+                  background: "color-mix(in srgb, var(--theme-surface-container-low) 72%, transparent)",
+                  color: "var(--theme-on-surface-variant)",
+                  border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 82%, transparent)",
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>
+                  auto_graph
+                </span>
+                View Briefing
+              </button>
+            </div>
+          </div>
+
+          <aside
+            style={{
+              borderRadius: "0.95rem",
+              padding: "1rem",
+              background: "color-mix(in srgb, var(--theme-surface-container-low) 76%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 78%, transparent)",
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.72rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                fontWeight: 700,
+                color: "var(--theme-on-surface-variant)",
+              }}
+            >
+              Weekly Targets
+            </p>
+            <div className="mt-3 space-y-3">
+              {weeklyTargets.map((target) => (
+                <div key={target.label}>
+                  <div className="flex items-center justify-between">
+                    <span style={{ fontSize: "0.8rem", color: "var(--theme-on-surface)", fontWeight: 600 }}>
+                      {target.label}
+                    </span>
+                    <span style={{ fontSize: "0.72rem", color: "var(--theme-on-surface-variant)" }}>
+                      {target.value}
+                    </span>
+                  </div>
+                  <div className="progress-track mt-1.5" style={{ height: "7px" }}>
+                    <div className="progress-fill" style={{ width: `${target.progress}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div
+              className="mt-4 rounded-lg px-3 py-2"
+              style={{
+                border: "1px solid color-mix(in srgb, var(--theme-outline-variant) 80%, transparent)",
+                background: "color-mix(in srgb, var(--theme-surface-container-high) 65%, transparent)",
+              }}
+            >
+              <p style={{ margin: 0, fontSize: "0.73rem", color: "var(--theme-on-surface-variant)" }}>
+                Forecast confidence is <strong style={{ color: "var(--theme-primary)" }}>High</strong> for this cycle.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
       {/* Summary Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {/* Total Balance */}
@@ -751,7 +965,7 @@ export default function DashboardPage() {
                           }}
                         />
                         <span
-                          style={{ fontSize: "0.875rem", color: "#cbd5e1" }}
+                          style={{ fontSize: "0.875rem", color: "var(--theme-on-surface-variant)" }}
                         >
                           {cat.label}
                         </span>
@@ -807,7 +1021,7 @@ export default function DashboardPage() {
                 <p
                   style={{
                     fontSize: "0.75rem",
-                    color: "#cbd5e1",
+                    color: "var(--theme-on-surface-variant)",
                     marginBottom: "1rem",
                     lineHeight: 1.5,
                   }}

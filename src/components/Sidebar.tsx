@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
@@ -14,7 +14,58 @@ const mainNav = [
   { icon: "settings", label: "Settings", href: "/settings" },
 ];
 
+const PROFILE_STORAGE_KEY = "aetheris-profile-settings";
+const PROFILE_UPDATED_EVENT = "aetheris-profile-updated";
 const DEFAULT_USER_NAME = "Julian Sterling";
+const DEFAULT_USER_SNAPSHOT = JSON.stringify({ fullName: DEFAULT_USER_NAME });
+
+const parseEnrolledUserName = (snapshot: string) => {
+  try {
+    const parsed = JSON.parse(snapshot) as { fullName?: unknown };
+    if (typeof parsed.fullName === "string" && parsed.fullName.trim().length > 0) {
+      return parsed.fullName.trim();
+    }
+  } catch {
+    // Keep fallback user name when parsing fails.
+  }
+
+  return DEFAULT_USER_NAME;
+};
+
+const getEnrolledUserSnapshot = () => {
+  if (typeof window === "undefined") return DEFAULT_USER_SNAPSHOT;
+
+  try {
+    return window.localStorage.getItem(PROFILE_STORAGE_KEY) ?? DEFAULT_USER_SNAPSHOT;
+  } catch {
+    return DEFAULT_USER_SNAPSHOT;
+  }
+};
+
+const getEnrolledUserServerSnapshot = () => DEFAULT_USER_SNAPSHOT;
+
+const subscribeEnrolledUser = (onStoreChange: () => void) => {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key && event.key !== PROFILE_STORAGE_KEY) return;
+    onStoreChange();
+  };
+
+  const handleProfileUpdated = () => {
+    onStoreChange();
+  };
+
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(PROFILE_UPDATED_EVENT, handleProfileUpdated);
+
+  return () => {
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(PROFILE_UPDATED_EVENT, handleProfileUpdated);
+  };
+};
 
 const getNavItemStyle = (isActive: boolean): CSSProperties =>
   isActive
@@ -35,7 +86,12 @@ export function Sidebar() {
   const { role } = useRole();
   const { showToast } = useNotification();
   const { isSidebarCollapsed, toggleSidebar, openCredentialPanel } = useLayout();
-  const enrolledUserName = DEFAULT_USER_NAME;
+  const enrolledUserSnapshot = useSyncExternalStore(
+    subscribeEnrolledUser,
+    getEnrolledUserSnapshot,
+    getEnrolledUserServerSnapshot
+  );
+  const enrolledUserName = parseEnrolledUserName(enrolledUserSnapshot);
 
   const handleOpenCredentialPanel = () => {
     openCredentialPanel();

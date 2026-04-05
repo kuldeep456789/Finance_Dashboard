@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -14,7 +15,16 @@ export function TopBar({ title, subtitle }: TopBarProps) {
   return (
     <div className="top-bar">
       <div>
-        <h1 className="top-bar-title">{title}</h1>
+        <div className="top-bar-title-row">
+          <Image
+            src="/favicon.ico"
+            alt="Aetheris Finance logo"
+            width={24}
+            height={24}
+            className="top-bar-title-logo"
+          />
+          <h1 className="top-bar-title">{title}</h1>
+        </div>
         {subtitle && (
           <p className="top-bar-subtitle">{subtitle}</p>
         )}
